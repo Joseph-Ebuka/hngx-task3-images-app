@@ -15,7 +15,7 @@ const SignUp = () => {
     const email = e.target[1].value;
     const password = e.target[2].value;
     try {
-      const res = await createUserWithEmailAndPassword(auth, email, password);
+      const res = await createUserWithEmailAndPassword(auth, email, password, displayName);
       navigate("/");
       console.log(res);
     } catch (err) {
