@@ -3,8 +3,11 @@ import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import { auth } from "../../firebaseConfig";
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
 
 const Home = () => {
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const [user, setUser] = useState({});
   const [images, setImages] = useState([]);
@@ -55,6 +58,7 @@ const Home = () => {
         setImages(json);
       })
       .then(() => setSearching(true))
+      .then(() => setLoading(false))
       .catch((err) => console.error(err));
   };
   //console.log(images);
@@ -73,7 +77,7 @@ const Home = () => {
       .then((json) => {
         setSearch(json.results);
       })
-
+      .then(() => setLoading(false))
       .catch((err) => console.error(err));
   };
 
@@ -100,29 +104,21 @@ const Home = () => {
   const showFirstletter = () => {
     if (user && user.email) {
       const letter = user.email[0].toUpperCase();
-      return <>
-      {letter}
-      </>;
+      return <>{letter}</>;
     } else {
       return;
     }
   };
-  showFirstletter()
+  showFirstletter();
 
-
-
-  const handleSignout  = ()=>{
-    const userConfirms = window.confirm("Are you sure u want to sign out?")
-    if(userConfirms){
-       auth.signOut(auth)
-    }else{
-      return(
-        <>
-        continue dragging and dropping
-        </>
-      )
+  const handleSignout = () => {
+    const userConfirms = window.confirm("Are you sure u want to sign out?");
+    if (userConfirms) {
+      auth.signOut(auth);
+    } else {
+      return <>continue dragging and dropping</>;
     }
-  }
+  };
   return (
     <div className="home">
       <div className="homeContainer">
@@ -153,15 +149,20 @@ const Home = () => {
               <button onClick={handleSignout} className="signout">
                 SignOut
               </button>
-              <span style={{
-                backgroundColor:"#0a4d6e",
-                padding:"5px",
-                borderRadius:"50%",
-                width:"20px",
-                height:"20px",
-                textAlign:"center",
-                color:"white"
-              }}> {showFirstletter()}</span>
+              <span
+                style={{
+                  backgroundColor: "#0a4d6e",
+                  padding: "5px",
+                  borderRadius: "50%",
+                  width: "20px",
+                  height: "20px",
+                  textAlign: "center",
+                  color: "white",
+                }}
+              >
+                {" "}
+                {showFirstletter()}
+              </span>
             </>
           )}
         </div>
