@@ -33,7 +33,7 @@ const Home = () => {
       reorderdImages.splice(destinationIndex, 0, removedImage);
 
       return setImages(reorderdImages);
-    }else if (type === "group"){
+    } else if (type === "group") {
       const reorderdSearches = [...search];
 
       const sourceIndex = source.index;
@@ -66,11 +66,6 @@ const Home = () => {
   const searcMovie = () => {
     const input = document.getElementById("input");
 
-      if( input.value === " "){
-        setSearching(true)
-      }else{
-        setSearching(false)
-      }
     fetch(
       `https://api.unsplash.com/search/photos?query=${input.value}&client_id=SMcrsx4CkpwiyQ9dToYuenndE7R9k99unSZU-Q0Aw2I`
     )
@@ -80,9 +75,6 @@ const Home = () => {
       })
 
       .catch((err) => console.error(err));
-
-
-
   };
 
   useEffect(() => {
@@ -94,7 +86,6 @@ const Home = () => {
   };
 
   useEffect(() => {
- 
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         setUser(user);
@@ -106,6 +97,32 @@ const Home = () => {
     return () => unsubscribe();
   }, []);
 
+  const showFirstletter = () => {
+    if (user && user.email) {
+      const letter = user.email[0].toUpperCase();
+      return <>
+      {letter}
+      </>;
+    } else {
+      return;
+    }
+  };
+  showFirstletter()
+
+
+
+  const handleSignout  = ()=>{
+    const userConfirms = window.confirm("Are you sure u want to sign out?")
+    if(userConfirms){
+       auth.signOut(auth)
+    }else{
+      return(
+        <>
+        continue dragging and dropping
+        </>
+      )
+    }
+  }
   return (
     <div className="home">
       <div className="homeContainer">
@@ -129,12 +146,22 @@ const Home = () => {
               <button className="signup" onClick={() => navigate("/signup")}>
                 Signup
               </button>
+              <></>
             </div>
           ) : (
             <>
-              <button onClick={() => auth.signOut(auth)} className="signout">
+              <button onClick={handleSignout} className="signout">
                 SignOut
               </button>
+              <span style={{
+                backgroundColor:"#0a4d6e",
+                padding:"5px",
+                borderRadius:"50%",
+                width:"20px",
+                height:"20px",
+                textAlign:"center",
+                color:"white"
+              }}> {showFirstletter()}</span>
             </>
           )}
         </div>
