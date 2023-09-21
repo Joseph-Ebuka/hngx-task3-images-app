@@ -1,7 +1,10 @@
 import { signInWithEmailAndPassword } from "firebase/auth";
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { auth } from "../../firebaseConfig";
 
 const SignIn = () => {
+  const navigate = useNavigate();
   const [err, setErr] = useState(false);
 
   const handleSubmit = async (e) => {
@@ -9,46 +12,47 @@ const SignIn = () => {
     const email = e.target[0].value;
     const password = e.target[1].value;
     try {
-      const res = signInWithEmailAndPassword(auth, email, password);
+      const res = await signInWithEmailAndPassword(auth, email, password);
       console.log(res);
+      navigate("/");
     } catch (error) {
       setErr(true);
+      console.log("Error", error?.message || "Something went wrong");
     }
   };
 
   return (
     <div>
       <div className="signUp">
-        {err && <span>Please check your details</span>}
         <div className="signUpPageContent">
+          <nav>
+          <span>
+              Don't have an Account?{" "}
+            </span>
+              <p className="login-signup" onClick={() => navigate("/signup")}>
+                Sign Up
+              </p>
+          </nav>
           <form onSubmit={handleSubmit}>
             <div className="logo">
               <img src="" alt="" />
               <span>Unsplash</span>
             </div>
-            <p>Register</p>
+            <div className="gettingStarted">
+            <p>Welcome Back</p>
+            <sub>Log into your account</sub>
+            </div>
             <div className="inputs">
               <input type="email" placeholder="email" required />
               <input type="password" placeholder="Password" required />
-              <button>Sign In</button>
+              <button type="submit">Sign In</button>
             </div>
-            <span
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "5px",
-                fontSize: "18px",
-              }}
-            >
-              Don't have an Account?{" "}
-              <p
-                className="login-signup"
-                style={{ color: "", textDecoration: "underline" }}
-              >
-                Sign Up
-              </p>
-            </span>
+           
           </form>
+          {err && <span
+            style={{
+              color:"red"
+            }}>Please check your details</span>}
         </div>
       </div>
     </div>

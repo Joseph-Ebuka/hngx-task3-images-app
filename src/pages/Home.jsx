@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
-//import firebase from 'firebase/app';
-import "firebase/auth";
-import { useNavigate } from 'react-router-dom';
+import { onAuthStateChanged, signOut } from "firebase/auth";
+import { useNavigate } from "react-router-dom";
+import { auth } from "../../firebaseConfig";
 
 const Home = () => {
+  const navigate = useNavigate();
+  const [user, setUser] = useState({});
   const [images, setImages] = useState([]);
 
   const [search, setSearch] = useState([]);
@@ -31,6 +33,16 @@ const Home = () => {
       reorderdImages.splice(destinationIndex, 0, removedImage);
 
       return setImages(reorderdImages);
+    }else if (type === "group"){
+      const reorderdSearches = [...search];
+
+      const sourceIndex = source.index;
+      const destinationIndex = destination.index;
+
+      const [removedImage] = reorderdSearches.splice(sourceIndex, 1);
+      reorderdSearches.splice(destinationIndex, 0, removedImage);
+
+      return setSearch(reorderdSearches);
     }
   };
 
@@ -54,6 +66,11 @@ const Home = () => {
   const searcMovie = () => {
     const input = document.getElementById("input");
 
+      if( input.value === " "){
+        setSearching(true)
+      }else{
+        setSearching(false)
+      }
     fetch(
       `https://api.unsplash.com/search/photos?query=${input.value}&client_id=SMcrsx4CkpwiyQ9dToYuenndE7R9k99unSZU-Q0Aw2I`
     )
@@ -63,6 +80,9 @@ const Home = () => {
       })
 
       .catch((err) => console.error(err));
+
+
+
   };
 
   useEffect(() => {
@@ -70,26 +90,21 @@ const Home = () => {
   }, []);
   const handleSearch = () => {
     searcMovie();
-    setSearching(true);
+    setSearching(false);
   };
-  const specialFeature = ({ children }) => {
-    const navigate = useNavigate();
-    const [user, setUser] = useState(null);
-  
-    useEffect(() => {
-      const unsubscribe = firebase.auth().onAuthStateChanged((authUser) => {
-        if (authUser) {
-          setUser(authUser);
-        } else {
-          navigate('/login');
-        }
-      });
-  
-      return () => unsubscribe();
-    }, [navigate]);
-  
-    return user ? children : null;
-  };
+
+  useEffect(() => {
+ 
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setUser(user);
+      } else {
+        setUser(null);
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   return (
     <div className="home">
@@ -103,94 +118,157 @@ const Home = () => {
               type="search"
               id="input"
               onChange={handleSearch}
-              onClick={() => {
-                setSearching(true), console.log("first");
-              }}
               placeholder="Search for images..."
             />
           </div>
-          <div className="login-signUp">
-            <button className="login">Login</button>
-            <button className="signup">Signup</button>
-          </div>
+          {!user ? (
+            <div className="login-signUp">
+              <button className="login" onClick={() => navigate("/signin")}>
+                Login
+              </button>
+              <button className="signup" onClick={() => navigate("/signup")}>
+                Signup
+              </button>
+            </div>
+          ) : (
+            <>
+              <button onClick={() => auth.signOut(auth)} className="signout">
+                SignOut
+              </button>
+            </>
+          )}
         </div>
-        <DragDropContext onDragEnd={handleDragDrop}>
-          <Droppable droppableId="ROOT" type="group" className="imagesSection">
-            {(provided) => (
-              <div
-                {...provided.droppableProps}
-                ref={provided.innerRef}
-                className="mainWrapper"
-              >
+        {user ? (
+          <DragDropContext onDragEnd={handleDragDrop}>
+            <Droppable
+              droppableId="ROOT"
+              type="group"
+              className="imagesSection"
+            >
+              {(provided) => (
+                <div
+                  {...provided.droppableProps}
+                  ref={provided.innerRef}
+                  className="mainWrapper"
+                >
+                  {searching ? (
+                    <>
+                      {" "}
+                      {images.map((content, index) => {
+                        return (
+                          <Draggable
+                            draggableId={content.id}
+                            className="main"
+                            key={content.id}
+                            index={index}
+                          >
+                            {(provided) => (
+                              <main
+                                {...provided.dragHandleProps}
+                                {...provided.draggableProps}
+                                ref={provided.innerRef}
+                              >
+                                <div className="card">
+                                  <div className="image"></div>
+                                  <img
+                                    src={content.urls.regular}
+                                    alt="unsplashImg"
+                                  />
+                                  <span>{content.alt_description}</span>
+                                </div>
+                              </main>
+                            )}
+                          </Draggable>
+                        );
+                      })}
+                    </>
+                  ) : (
+                    <>
+                      {" "}
+                      {search.map((content, index) => {
+                        return (
+                          <Draggable
+                            draggableId={content.id}
+                            className="main"
+                            key={content.id}
+                            index={index}
+                          >
+                            {(provided) => (
+                              <main
+                                {...provided.dragHandleProps}
+                                {...provided.draggableProps}
+                                ref={provided.innerRef}
+                              >
+                                <div className="card">
+                                  <div className="image"></div>
+                                  <img
+                                    src={content.urls.regular}
+                                    alt="unsplashImg"
+                                  />
+                                  <span>{content.alt_description}</span>
+                                </div>
+                              </main>
+                            )}
+                          </Draggable>
+                        );
+                      })}
+                    </>
+                  )}
+
+                  {provided.placeholder}
+                </div>
+              )}
+            </Droppable>
+          </DragDropContext>
+        ) : (
+          <>
+            <div className="imagesSection">
+              <div className="mainWrapper">
                 {searching ? (
                   <>
                     {" "}
-                    {images.map((content, index) => {
+                    {images.map((content) => {
                       return (
-                        <Draggable
-                          draggableId={content.id}
-                          className="main"
-                          key={content.id}
-                          index={index}
-                        >
-                          {(provided) => (
-                            <main
-                              {...provided.dragHandleProps}
-                              {...provided.draggableProps}
-                              ref={provided.innerRef}
-                            >
-                              <div className="card">
-                                <div className="image"></div>
-                                <img
-                                  src={content.urls.regular}
-                                  alt="unsplashImg"
-                                />
-                                <span>{content.alt_description}</span>
-                              </div>
-                            </main>
-                          )}
-                        </Draggable>
+                        <div className="main" key={content.id}>
+                          <main>
+                            <div className="card">
+                              <div className="image"></div>
+                              <img
+                                src={content.urls.regular}
+                                alt="unsplashImg"
+                              />
+                              <span>{content.alt_description}</span>
+                            </div>
+                          </main>
+                        </div>
                       );
                     })}
                   </>
                 ) : (
-                  <>
+                  <div>
                     {" "}
                     {search.map((content, index) => {
                       return (
-                        <Draggable
-                          draggableId={content.id}
-                          className="main"
-                          key={content.id}
-                          index={index}
-                        >
-                          {(provided) => (
-                            <main
-                              {...provided.dragHandleProps}
-                              {...provided.draggableProps}
-                              ref={provided.innerRef}
-                            >
-                              <div className="card">
-                                <div className="image"></div>
-                                <img
-                                  src={content.urls.regular}
-                                  alt="unsplashImg"
-                                />
-                                <span>{content.alt_description}</span>
-                              </div>
-                            </main>
-                          )}
-                        </Draggable>
+                        <div className="main">
+                          <main>
+                            <div className="card">
+                              <div className="image"></div>
+                              <img
+                                src={content.urls.regular}
+                                alt="unsplashImg"
+                              />
+                              <span>{content.alt_description}</span>
+                            </div>
+                          </main>
+                        </div>
                       );
                     })}
-                  </>
+                  </div>
                 )}
-
-                {provided.placeholder}
               </div>
-            )}
-          </Droppable>
-        </DragDropContext>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

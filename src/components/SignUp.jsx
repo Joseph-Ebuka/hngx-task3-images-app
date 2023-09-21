@@ -1,22 +1,22 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { auth } from "../../firebaseConfig";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import {useNavigate} from 'react-router-dom'
-
-
+import { useNavigate } from "react-router-dom";
 
 const SignUp = () => {
+  const navigate = useNavigate();
+
   const [err, setErr] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const username = e.target[0].value;
+    const displayName = e.target[0].value;
     const email = e.target[1].value;
     const password = e.target[2].value;
     try {
-      const res = createUserWithEmailAndPassword(auth, email, password);
-      
+      const res = await createUserWithEmailAndPassword(auth, email, password);
+      navigate("/");
       console.log(res);
     } catch (err) {
       setErr(true);
@@ -27,37 +27,34 @@ const SignUp = () => {
   return (
     <div className="signUp">
       <div className="signUpPageContent">
+        <nav>
+          {" "}
+          <span>Already have an account? </span>
+          <p className="login-signup" onClick={() => navigate("/signin")}>
+            Login
+          </p>
+        </nav>
         <form onSubmit={handleSubmit}>
-          <i class="fi fi-br-arrow-left back" onClick={() => navigate("/")}></i>
           <div className="logo">
             <img src="" alt="" />
             <span>Unsplash</span>
           </div>
-          <p>Login</p>
+          <div className="gettingStarted">
+            <p>Get started with Unsplash</p>
+            <sub>Getting started is easy</sub>
+          </div>
           <div className="inputs">
             <input type="text" required placeholder="Username" />
             <input type="email" placeholder="email" required />
             <input type="password" placeholder="Password" required />
-            <button>Sign Up</button>
-            {err && <span>Something Went wrong</span>}
+            <button type="submit">Sign Up</button>
+           <p className="condition"> By creating an account you have agreed to our terms of use </p>
           </div>
-          <span
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "5px",
-              fontSize: "13px",
-            }}
-          >
-            Already have an account?{" "}
-            <p
-              className="login-signup"
-              onClick={() => navigate("/signin")}
-              style={{ color: "", textDecoration: "underline" }}
-            >
-              Login
-            </p>
-          </span>
+          {err && <span
+          style={{
+            color:"red"
+          }}
+          >Something Went wrong</span>}
         </form>
       </div>
     </div>
