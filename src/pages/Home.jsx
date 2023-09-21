@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { auth } from "../../firebaseConfig";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
+import Loader from "../components/Loader";
 
 const Home = () => {
   const [loading, setLoading] = useState(true);
@@ -127,12 +128,14 @@ const Home = () => {
             <span>Logo</span>
           </div>
           <div className="input">
-            <input
-              type="search"
-              id="input"
-              onChange={handleSearch}
-              placeholder="Search for images..."
-            />
+            <form action="">
+              <input
+                type="search"
+                id="input"
+                onChange={handleSearch}
+                placeholder="Search for images..."
+              />
+            </form>
           </div>
           {!user ? (
             <div className="login-signUp">
@@ -166,7 +169,8 @@ const Home = () => {
             </>
           )}
         </div>
-        {user ? (
+        {loading ? (<Loader/>) : (<>
+          {user ? (
           <DragDropContext onDragEnd={handleDragDrop}>
             <Droppable
               droppableId="ROOT"
@@ -191,20 +195,22 @@ const Home = () => {
                             index={index}
                           >
                             {(provided) => (
-                              <main
-                                {...provided.dragHandleProps}
-                                {...provided.draggableProps}
-                                ref={provided.innerRef}
-                              >
-                                <div className="card">
-                                  <div className="image"></div>
-                                  <img
-                                    src={content.urls.regular}
-                                    alt="unsplashImg"
-                                  />
-                                  <span>{content.alt_description}</span>
-                                </div>
-                              </main>
+                              <>
+                                <main
+                                  {...provided.dragHandleProps}
+                                  {...provided.draggableProps}
+                                  ref={provided.innerRef}
+                                >
+                                  <div className="card">
+                                    <div className="image"></div>
+                                    <img
+                                      src={content.urls.regular}
+                                      alt="unsplashImg"
+                                    />
+                                    <span>{content.alt_description}</span>
+                                  </div>
+                                </main>
+                              </>
                             )}
                           </Draggable>
                         );
@@ -297,6 +303,8 @@ const Home = () => {
             </div>
           </>
         )}
+        </>)} 
+       
       </div>
     </div>
   );
