@@ -13,7 +13,6 @@ const SignIn = () => {
     const password = e.target[1].value;
     try {
       const res = await signInWithEmailAndPassword(auth, email, password);
-      console.log(res);
       navigate("/");
     } catch (error) {
       setErr(true);
