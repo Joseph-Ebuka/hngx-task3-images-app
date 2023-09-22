@@ -169,8 +169,8 @@ const Home = () => {
             </>
           )}
         </div>
-        {loading ? (<Loader/>) : (<>
-          {user ? (
+        {loading && <Loader/>}
+        {user ? (
           <DragDropContext onDragEnd={handleDragDrop}>
             <Droppable
               droppableId="ROOT"
@@ -188,31 +188,39 @@ const Home = () => {
                       {" "}
                       {images.map((content, index) => {
                         return (
-                          <Draggable
-                            draggableId={content.id}
-                            className="main"
-                            key={content.id}
-                            index={index}
-                          >
-                            {(provided) => (
-                              <>
-                                <main
-                                  {...provided.dragHandleProps}
-                                  {...provided.draggableProps}
-                                  ref={provided.innerRef}
-                                >
-                                  <div className="card">
-                                    <div className="image"></div>
-                                    <img
-                                      src={content.urls.regular}
-                                      alt="unsplashImg"
-                                    />
-                                    <span>{content.alt_description}</span>
-                                  </div>
-                                </main>
-                              </>
+                          <>
+                          {loading && <Loader/>}
+                            {loading ? (
+                              <Loader />
+                            ) : (
+                              <Draggable
+                                draggableId={content.id}
+                                className="main"
+                                key={content.id}
+                                index={index}
+                              >
+                                {(provided) => (
+                                  <>
+                                  {loading && <Loader/>}
+                                    <main
+                                      {...provided.dragHandleProps}
+                                      {...provided.draggableProps}
+                                      ref={provided.innerRef}
+                                    >
+                                      <div className="card">
+                                        <div className="image"></div>
+                                        <img
+                                          src={content.urls.regular}
+                                          alt="unsplashImg"
+                                        />
+                                        <span>{content.alt_description}</span>
+                                      </div>
+                                    </main>
+                                  </>
+                                )}
+                              </Draggable>
                             )}
-                          </Draggable>
+                          </>
                         );
                       })}
                     </>
@@ -221,29 +229,36 @@ const Home = () => {
                       {" "}
                       {search.map((content, index) => {
                         return (
-                          <Draggable
-                            draggableId={content.id}
-                            className="main"
-                            key={content.id}
-                            index={index}
-                          >
-                            {(provided) => (
-                              <main
-                                {...provided.dragHandleProps}
-                                {...provided.draggableProps}
-                                ref={provided.innerRef}
+                          <>
+                            {loading ? (
+                              <Loader />
+                            ) : (
+                              <Draggable
+                                draggableId={content.id}
+                                className="main"
+                                key={content.id}
+                                index={index}
                               >
-                                <div className="card">
-                                  <div className="image"></div>
-                                  <img
-                                    src={content.urls.regular}
-                                    alt="unsplashImg"
-                                  />
-                                  <span>{content.alt_description}</span>
-                                </div>
-                              </main>
+                                {(provided) => (
+                                  <main
+                                    {...provided.dragHandleProps}
+                                    {...provided.draggableProps}
+                                    ref={provided.innerRef}
+                                  >
+                                    {loading && <Loader/>}
+                                    <div className="card">
+                                      <div className="image"></div>
+                                      <img
+                                        src={content.urls.regular}
+                                        alt="unsplashImg"
+                                      />
+                                      <span>{content.alt_description}</span>
+                                    </div>
+                                  </main>
+                                )}
+                              </Draggable>
                             )}
-                          </Draggable>
+                          </>
                         );
                       })}
                     </>
@@ -263,18 +278,25 @@ const Home = () => {
                     {" "}
                     {images.map((content) => {
                       return (
-                        <div className="main" key={content.id}>
-                          <main>
-                            <div className="card">
-                              <div className="image"></div>
-                              <img
-                                src={content.urls.regular}
-                                alt="unsplashImg"
-                              />
-                              <span>{content.alt_description}</span>
+                        <>
+                          {loading ? (
+                            <Loader />
+                          ) : (
+                            <div className="main" key={content.id}>
+                              <main>
+                                <div className="card">
+                                  {loading && <Loader/>}
+                                  <div className="image"></div>
+                                  <img
+                                    src={content.urls.regular}
+                                    alt="unsplashImg"
+                                  />
+                                  <span>{content.alt_description}</span>
+                                </div>
+                              </main>
                             </div>
-                          </main>
-                        </div>
+                          )}
+                        </>
                       );
                     })}
                   </>
@@ -283,18 +305,25 @@ const Home = () => {
                     {" "}
                     {search.map((content, index) => {
                       return (
-                        <div className="main">
-                          <main>
-                            <div className="card">
-                              <div className="image"></div>
-                              <img
-                                src={content.urls.regular}
-                                alt="unsplashImg"
-                              />
-                              <span>{content.alt_description}</span>
+                        <>
+                          {loaing ? (
+                            <Loader />
+                          ) : (
+                            <div className="main">
+                              <main>
+                                <div className="card">
+                                  {loading && <Loader/>}
+                                  <div className="image"></div>
+                                  <img
+                                    src={content.urls.regular}
+                                    alt="unsplashImg"
+                                  />
+                                  <span>{content.alt_description}</span>
+                                </div>
+                              </main>
                             </div>
-                          </main>
-                        </div>
+                          )}
+                        </>
                       );
                     })}
                   </div>
@@ -303,8 +332,6 @@ const Home = () => {
             </div>
           </>
         )}
-        </>)} 
-       
       </div>
     </div>
   );
